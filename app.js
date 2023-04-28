@@ -14,6 +14,9 @@ app.use(
   })
 );
 
+import user from "./routes/userRoutes.js";
+
+app.use("/api/v1", user);
 export default app;
 
 app.use(ErrorMiddleware);
