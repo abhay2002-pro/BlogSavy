@@ -21,7 +21,6 @@ const schema = new mongoose.Schema({
     minLength: [6, "Password must be at least 6 characters"],
     select: false,
   },
-  blogs: [{ type: mongoose.Schema.Types.ObjectId, ref: "Blog" }],
 
   resetPasswordToken: String,
   resetPasswordExpire: String,
