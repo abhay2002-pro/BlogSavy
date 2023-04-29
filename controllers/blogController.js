@@ -40,10 +40,14 @@ export const getBlogById = catchAsyncError(async (req, res, next) => {
     const blog_id = req.params.id;
 
     if (!blog_id) {
-        return next(new ErrorHandler("Please enter all parameters", 400));
+        return next(new ErrorHandler("Please provide blog id in parameters", 400));
     }
 
     const blog = await Blog.findById(blog_id);
+
+    if (!blog) {
+        return next(new ErrorHandler("Incorrect blog id", 401));
+    }
 
     res.status(201).send({
         "success": "true",
@@ -55,16 +59,16 @@ export const updateBlog = catchAsyncError(async (req, res, next) => {
     const blog_id = req.params.id;
 
     if (!blog_id) {
-        return next(new ErrorHandler("Please enter all parameters", 400));
+        return next(new ErrorHandler("Please provide blog id in parameters", 400));
     }
 
     const blog = await Blog.findById(blog_id);
 
-    if (!blog_id) {
+    if (!blog) {
         return next(new ErrorHandler("Incorrect blog id", 401));
     }
 
-    if (!req.body.name && !req.body.email) {
+    if (!req.body.title && !req.body.content) {
         return next(new ErrorHandler("Please provide fields to update", 400));
     }
 
