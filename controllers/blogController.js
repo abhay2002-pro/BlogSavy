@@ -1,14 +1,6 @@
 import { catchAsyncError } from "../middlewares/catchAsyncError.js";
 import { Blog } from "../models/Blog.js";
 
-export const allBlogs = catchAsyncError(async (req, res, next) => {
-    const posts = await Blog.find({})
-    res.status(201).send({
-        "success": "true",
-        posts
-    })
-})
-
 export const getBlogsOfASingleUser = catchAsyncError(async (req, res, next) => {
     const user = req.user;
     const blogs = await Blog.find({ "author": user.id });
@@ -37,6 +29,7 @@ export const createBlog = catchAsyncError(async (req, res, next) => {
 })
 
 export const getBlogById = catchAsyncError(async (req, res, next) => {
+    const user = req.user;
     const blog_id = req.params.id;
 
     if (!blog_id) {
@@ -47,6 +40,10 @@ export const getBlogById = catchAsyncError(async (req, res, next) => {
 
     if (!blog) {
         return next(new ErrorHandler("Incorrect blog id", 401));
+    }
+
+    if (blog.author != user.id) {
+        return next(new ErrorHandler("You do not have permission to read this blog post", 400));
     }
 
     res.status(201).send({
@@ -57,6 +54,7 @@ export const getBlogById = catchAsyncError(async (req, res, next) => {
 
 export const updateBlog = catchAsyncError(async (req, res, next) => {
     const blog_id = req.params.id;
+    const user = req.user;
 
     if (!blog_id) {
         return next(new ErrorHandler("Please provide blog id in parameters", 400));
@@ -66,6 +64,10 @@ export const updateBlog = catchAsyncError(async (req, res, next) => {
 
     if (!blog) {
         return next(new ErrorHandler("Incorrect blog id", 401));
+    }
+
+    if (blog.author != user.id) {
+        return next(new ErrorHandler("You do not have permission to update this blog post", 400));
     }
 
     if (!req.body.title && !req.body.content) {
@@ -85,15 +87,21 @@ export const updateBlog = catchAsyncError(async (req, res, next) => {
 
 export const deleteBlog = catchAsyncError(async (req, res, next) => {
     const blog_id = req.params.id;
+    const user = req.user;
 
     if (!blog_id) {
         return next(new ErrorHandler("Incorrect blog id", 401));
     }
 
-    await Blog.findByIdAndDelete(blog_id);
+    const blog = Blog.findById(blog_id);
+    if (blog.author != user.id) {
+        return next(new ErrorHandler("You do not have permission to delete this blog post", 400));
+    }
+
+    await blog.remove();
 
     res.status(201).send({
         "success": "true",
-        "message": "Blog delete successfully"
+        "message": "Blog deleted successfully"
     })
 })
