@@ -22,9 +22,14 @@ export const createBlog = catchAsyncError(async (req, res, next) => {
     const user = req.user;
     const { title, content } = req.body;
 
+    if (!title || !content) {
+        return next(new ErrorHandler("Please enter all field", 400));
+    }
+
     await Blog.create({
         title, content, author: user.id
     })
+
     res.status(201).send({
         "success": "true",
         "message": "Blog created successfully"
@@ -33,6 +38,11 @@ export const createBlog = catchAsyncError(async (req, res, next) => {
 
 export const getBlogById = catchAsyncError(async (req, res, next) => {
     const blog_id = req.params.id;
+
+    if (!blog_id) {
+        return next(new ErrorHandler("Please enter all parameters", 400));
+    }
+
     const blog = await Blog.findById(blog_id);
 
     res.status(201).send({
@@ -43,10 +53,24 @@ export const getBlogById = catchAsyncError(async (req, res, next) => {
 
 export const updateBlog = catchAsyncError(async (req, res, next) => {
     const blog_id = req.params.id;
+
+    if (!blog_id) {
+        return next(new ErrorHandler("Please enter all parameters", 400));
+    }
+
     const blog = await Blog.findById(blog_id);
 
-    blog.title = req.body.title;
-    blog.content = req.body.content;
+    if (!blog_id) {
+        return next(new ErrorHandler("Incorrect blog id", 401));
+    }
+
+    if (!req.body.name && !req.body.email) {
+        return next(new ErrorHandler("Please provide fields to update", 400));
+    }
+
+    if (req.body.title != null) blog.title = req.body.title;
+    if (req.body.content != null) blog.content = req.body.content;
+
     await blog.save();
 
     res.status(201).send({
@@ -57,7 +81,12 @@ export const updateBlog = catchAsyncError(async (req, res, next) => {
 
 export const deleteBlog = catchAsyncError(async (req, res, next) => {
     const blog_id = req.params.id;
-    const blog = await Blog.findByIdAndDelete(blog_id);
+
+    if (!blog_id) {
+        return next(new ErrorHandler("Incorrect blog id", 401));
+    }
+
+    await Blog.findByIdAndDelete(blog_id);
 
     res.status(201).send({
         "success": "true",
