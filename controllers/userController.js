@@ -70,3 +70,75 @@ export const logout = catchAsyncError(async (req, res, next) => {
       message: "Logged Out Successfully",
     });
 });
+
+export const getMyProfile = catchAsyncError(async (req, res, next) => {
+  const user = req.user;
+  res.status(200).json({
+    success: true,
+    user
+  })
+});
+
+export const getUserById = catchAsyncError(async (req, res, next) => {
+  const user_id = req.params;
+
+  if (!user_id) {
+    return next(new ErrorHandler("Please provide user id in parameters", 400));
+  }
+
+  const user = await User.findById(user_id.id);
+
+  if (!user) return next(new ErrorHandler("Incorrect user id", 401));
+
+  res
+    .status(200)
+    .json({
+      success: true,
+      user
+    });
+});
+
+export const updateUser = catchAsyncError(async (req, res, next) => {
+  const user_id = req.params;
+
+  if (!user_id) {
+    return next(new ErrorHandler("Please enter all parameters", 400));
+  }
+
+  const user = await User.findById(user_id.id);
+
+  if (!user) return next(new ErrorHandler("Incorrect user id", 401));
+
+  if (!req.body.name && !req.body.email) {
+    return next(new ErrorHandler("Please provide fields to update", 400));
+  }
+
+  if (req.body.name != null) user.name = req.body.name;
+  if (req.body.email != null) user.email = req.body.email;
+
+  await user.save();
+  res
+    .status(200)
+    .json({
+      success: true,
+      message: "User updated sucessfully",
+      user
+    });
+});
+
+export const deleteUser = catchAsyncError(async (req, res, next) => {
+  const user_id = req.params;
+
+  if (!user_id) {
+    return next(new ErrorHandler("Please enter all parameters", 400));
+  }
+
+  await User.findByIdAndDelete(user_id.id)
+
+  res
+    .status(200)
+    .json({
+      success: true,
+      message: "User deleted sucessfully",
+    });
+});

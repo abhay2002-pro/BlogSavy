@@ -1,10 +1,18 @@
 import express from "express";
-import { login, logout, register } from "../controllers/userController.js";
+import { deleteUser, getMyProfile, getUserById, login, logout, register, updateUser } from "../controllers/userController.js";
+import { isAuthenticated } from "../middlewares/auth.js";
 
 const router = express.Router();
 
+// Normal user routes
 router.route("/register").post(register);
 router.route("/login").post(login);
 router.route("/logout").post(logout);
+router.route("/me").post(isAuthenticated, getMyProfile);
+
+// Admin routes
+router.route("/users/:id").get(getUserById);
+router.route("/users/:id").put(updateUser);
+router.route("/users/:id").delete(deleteUser);
 
 export default router;
