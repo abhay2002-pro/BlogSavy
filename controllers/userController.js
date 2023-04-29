@@ -40,15 +40,15 @@ export const login = catchAsyncError(async (req, res, next) => {
     return next(new ErrorHandler("Incorrect Email or Password", 401));
 
   const token = user.getJWTToken();
-  // const options = {
-  //   expires: new Date(Date.now() + 15 * 24 * 60 * 60 * 1000),
-  //   httpOnly: true,
-  //   secure: true,
-  //   sameSite: "none",
-  // };
+  const options = {
+    expires: new Date(Date.now() + 15 * 24 * 60 * 60 * 1000),
+    httpOnly: true,
+    secure: true,
+    sameSite: "none",
+  };
 
   res.status(200)
-    // .cookie("token", token, options)
+    .cookie("token", token, options)
     .json({
       status: true,
       message: "Logged in successfully",
@@ -59,12 +59,12 @@ export const login = catchAsyncError(async (req, res, next) => {
 export const logout = catchAsyncError(async (req, res, next) => {
   res
     .status(200)
-    // .cookie("token", null, {
-    //   expires: new Date(Date.now()),
-    //   httpOnly: true,
-    //   secure: true,
-    //   sameSite: "none",
-    // })
+    .cookie("token", null, {
+      expires: new Date(Date.now()),
+      httpOnly: true,
+      secure: true,
+      sameSite: "none",
+    })
     .json({
       success: true,
       message: "Logged Out Successfully",
@@ -88,7 +88,7 @@ export const getUserById = catchAsyncError(async (req, res, next) => {
 
   const user = await User.findById(user_id.id);
 
-  if (!user) return next(new ErrorHandler("Incorrect user id", 401));
+  if (!user) return next(new ErrorHandler("Incorrect user Id", 401));
 
   res
     .status(200)
@@ -102,7 +102,7 @@ export const updateUser = catchAsyncError(async (req, res, next) => {
   const user_id = req.params;
 
   if (!user_id) {
-    return next(new ErrorHandler("Please enter all parameters", 400));
+    return next(new ErrorHandler("Please provide user id in parameters", 400));
   }
 
   const user = await User.findById(user_id.id);
@@ -130,7 +130,7 @@ export const deleteUser = catchAsyncError(async (req, res, next) => {
   const user_id = req.params;
 
   if (!user_id) {
-    return next(new ErrorHandler("Please enter all parameters", 400));
+    return next(new ErrorHandler("Please provide user id in parameters", 400));
   }
 
   await User.findByIdAndDelete(user_id.id)
