@@ -5,8 +5,9 @@ import { User } from "../models/User.js";
 
 export const isAuthenticated = catchAsyncError(async (req, res, next) => {
     const authHeader = req.headers["authorization"];
-    const token = authHeader.split(" ")[1];
+    if (authHeader == null) return next(new ErrorHandler("Not Logged In", 401));
 
+    const token = authHeader.split(" ")[1];
     if (token == null) return next(new ErrorHandler("Not Logged In", 401));
 
     jwt.verify(token, process.env.JWT_SECRET, async (err, id) => {
