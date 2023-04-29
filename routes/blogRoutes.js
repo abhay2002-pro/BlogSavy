@@ -1,5 +1,5 @@
 import express from "express";
-import { allBlogs, createBlog, deleteBlog, getBlogById, getBlogsOfASingleUser, updateBlog } from "../controllers/blogController.js";
+import { createBlog, deleteBlog, getBlogById, getBlogsOfASingleUser, updateBlog } from "../controllers/blogController.js";
 import { isAuthenticated } from "../middlewares/auth.js";
 
 const router = express.Router();
